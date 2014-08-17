@@ -343,7 +343,7 @@ class ChatControlBase(MessageControl):
 
         print('sending message...')
         import push_message
-        threading.Thread(target=push_message.handleSendMms,
+        threading.Thread(target=push_message.handleSendMms, # this causes tons of race conditions. needs to be on the same thread that deques messages from mtalkconn
              args=(message, self.contact ),
               ).start()
         #self.set_chat_text(' > ' + message, widget)

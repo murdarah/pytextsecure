@@ -3,7 +3,7 @@ from keyutils import IdentityKeyUtil, ChatSessionUtil
 
 import ratcheting_session
 
-class SessionRecord:
+class SessionRecord: # This is the most useless class ever. should probably be changed to a bunch of functions
 
     def __init__(self, recipientId, deviceId = 1):
         self.recipientId = recipientId
@@ -118,7 +118,7 @@ class SessionState:
         receiverChainAndIndex = self.getReceiverChain(senderEphemeral)
         receiverChain = receiverChainAndIndex[0]
 
-        if receiverChain == None:
+        if receiverChain == None: # it would just crash on the above line if there's no receiver chain for senderEphemeral
             return None
 
         return ratcheting_session.ChainKey(receiverChain.chainKey.key, receiverChain.chainKey.index)
@@ -132,7 +132,7 @@ class SessionState:
         chain.chainKey.CopyFrom(chainKeyStructure)
         chain.senderEphemeral = senderEphemeral.serialize()
 
-        receiverChains = self.sessionStructure.receiverChains.add()
+        receiverChains = self.sessionStructure.receiverChains.add() # confusing name. shouldn't it be called receiverChain instead?
         receiverChains.CopyFrom(chain)
 
         if len(self.sessionStructure.receiverChains) > 5:
@@ -170,7 +170,7 @@ class SessionState:
         chainAndIndex = self.getReceiverChain(senderEphemeral)
         chain = chainAndIndex[0]
 
-        if chain == None:
+        if chain == None: # It would just crash on the above line
             return False
 
         messageKeys = chain.messageKeys
@@ -185,7 +185,7 @@ class SessionState:
         chainAndIndex = self.getReceiverChain(senderEphemeral)
         chain = chainAndIndex[0]
 
-        if chain == None:
+        if chain == None: # It would just crash on the above line
             return None
 
         messageKeys = chain.messageKeys
@@ -199,7 +199,7 @@ class SessionState:
                 break
 
         updatedChain = chain.ClearField("messageKeys")
-        chain.messageKeys.extend(messageKeys)
+        chain.messageKeys.extend(messageKeys) # should actually delete something from messageKeys
 
         #self.sessionStructure.ClearField("receiverChains")
         #self.sessionStructure.receiverChains.extend(updatedChain)

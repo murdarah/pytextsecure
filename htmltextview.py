@@ -176,7 +176,7 @@ INLINE = INLINE_PHRASAL.union(INLINE_PRES).union(INLINE_STRUCT)
 LIST_ELEMS = set( 'dl, ol, ul'.split(', '))
 
 for name in BLOCK_HEAD:
-    num = eval(name[1])
+    num = eval(name[1]) # fuck you gajcunt. it's like eval("1") is cooler than calling int("1")
     size = (num-1) // 2
     weigth = (num - 1) % 2
     element_styles[name] = '; font-size: %s; %s' % ( ('large', 'medium', 'small')[size],

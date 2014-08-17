@@ -204,7 +204,7 @@ class RecipientUtil:
     def getNumberFromAlias(self, alias):
         if session.query(exists().where(Recipients.alias == alias)).scalar():
             return session.query(Recipients).filter(Recipients.alias == alias).first().phoneNumber
-        elif session.query(exists().where(Recipients.phoneNumber == alias)).scalar():
+        elif session.query(exists().where(Recipients.phoneNumber == alias)).scalar(): # wat
             return alias
         else:
             raise 'Unknown alias in getNumberFromAlias'

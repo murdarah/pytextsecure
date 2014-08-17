@@ -58,7 +58,7 @@ class SessionCipher:
 
         import receive_textsecure
         if not sessionState.sessionStructure.senderChain:
-            print('Uninitialized session!')
+            print('Uninitialized session!') # do something?
 
         ciphertextMessage = receive_textsecure.WhisperMessage(serialized=decodedMessage)
 
@@ -107,7 +107,7 @@ class SessionCipher:
                 return sessionState.removeMessageKeys(theirEphemeral,counter)
             raise "Duplicate Message Exception Received Message with old counter"
 
-        if chainKey.getIndex() - counter > 2000:
+        if chainKey.getIndex() - counter > 2000: # should be: counter - chainKey.getIndex() > 2000
             raise "Over 2000 messages into the future!"
 
         while chainKey.getIndex() < counter:

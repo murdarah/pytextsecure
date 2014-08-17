@@ -192,7 +192,7 @@ class PreKeyWhisperMessage(CipherTextMessage):
 
 class WhisperMessage(CipherTextMessage):
 
-    MAC_LENGTH = 8
+    MAC_LENGTH = 8 # WTF
 
     def __init__(self, serialized=None, macKey=None, senderEphemeral=None, counter=None, previousCounter=None, ciphertext=None):
         self.type = self.WHISPER_TYPE
@@ -221,7 +221,7 @@ class WhisperMessage(CipherTextMessage):
     def initFromSerialized(self, serialized):
         version = serialized[0] #is this int 34? because initparams is int 34...
         message = serialized[1:][:len(serialized) - 1 - self.MAC_LENGTH]
-        mac = serialized[len(serialized) - 1 - self.MAC_LENGTH:][:self.MAC_LENGTH]
+        mac = serialized[len(serialized) - 1 - self.MAC_LENGTH:][:self.MAC_LENGTH] # isn't used?
 
         if (version & 0xFF) >> 4 <= 1:
             raise "Legacy message: " + str((version & 0xFF) >> 4)
@@ -250,8 +250,8 @@ class WhisperMessage(CipherTextMessage):
         ourMac = self.getMac( macKey, self.serialized[:len(self.serialized) - self.MAC_LENGTH] )
         theirMac = self.serialized[len(self.serialized) - self.MAC_LENGTH:][:self.MAC_LENGTH]
 
-        if not ourMac == theirMac:
-            print( "Bad Mac! (inside WhisperMessage verifyMac)")
+        if not ourMac == theirMac: # side channel?
+            print( "Bad Mac! (inside WhisperMessage verifyMac)") # do something?
 
     def getMac(self, macKey, serialized):
         fullMac = hmac.new(macKey, serialized, digestmod=hashlib.sha256).digest()
@@ -294,7 +294,7 @@ def handleEndSessionMessage(incomingPushMessageSignal, pushMessageContent):
 def handleReceivedTextMessage(incomingPushMessageSignal, pushMessageContent):
     global queue
     #insert into the database... or whatever here
-    alias = keyutils.RecipientUtil().getAliasFromNumber(incomingPushMessageSignal.source)
+    alias = keyutils.RecipientUtil().getAliasFromNumber(incomingPushMessageSignal.source) # is incomingPushMessageSignal.source authenticated?
     data = { 'alias' : alias, 'message' : pushMessageContent.body }
     print(alias + ': ' + pushMessageContent.body)
     queue.put(data)
@@ -308,7 +308,7 @@ def handleReceivedSecureMessage(incomingPushMessageSignal):
 
 import session_cipher
 def decryptWorkItem(message_id, incomingPushMessageSignal):
-    recipient = incomingPushMessageSignal.source
+    recipient = incomingPushMessageSignal.source# shouldn't these be sender and senderDevice? We're receiving a message from someone who *sent* a message
     recipientDevice = incomingPushMessageSignal.sourceDevice
 
     #if not SessionRecord().hasSession(recipientDevice):
@@ -324,7 +324,7 @@ def decryptWorkItem(message_id, incomingPushMessageSignal):
 def handleIncomingPushMessageProto(incomingPushMessageSignal):
     # by now the outside AES is decrypted
 
-    if incomingPushMessageSignal.type == 0: # TYPE_MESSAGE_PLAINTEXT
+    if incomingPushMessageSignal.type == 0: # TYPE_MESSAGE_PLAINTEXT # what is this, a backdoor? why is it using the numbers instead of names? also the .proto file says UNKNOWN. PLAINTEXT is 4
         pass
     elif incomingPushMessageSignal.type == 1: # TYPE_MESSAGE_CIPHERTEXT
         handleReceivedSecureMessage(incomingPushMessageSignal)
@@ -345,6 +345,7 @@ def decryptMessage(message):
     if data[0] != 1:
         raise "Got bad version number: " + str(data[0])
 
+    # what happens with invalid sizes?
     iv = data[1:1+16]
     ciphertext = data[1+16: len(data) - 10]
     ivAndCipherText = data[1: len(data) - 10]
@@ -360,8 +361,8 @@ def verifyMACWithVersionByte(data, key, mac, version = 1 ):
     #print(calculated_mac)
     #print(mac)
 
-    if calculated_mac[0:10] != mac:
-        print("Bad MAC")
+    if calculated_mac[0:10] != mac: # side channel?
+        print("Bad MAC") # do something?
 
 def encryptAESCTR(plaintext, key, counter):
     import struct
